@@ -1,0 +1,95 @@
+html {
+  font-size: 18px;
+}
+@media (max-width:  768px)  {
+  html {
+    font-size: 15px;
+  }
+}
+
+h1 {
+    background:deepskyblue;
+    color:white;
+    text-align:center;
+}
+h2 {
+    font-weight:bold;
+    font-size:1.5rem;
+    background:deepskyblue;
+    color:white;
+    padding:0.5rem;
+}
+h3 {
+    font-size:1.25rem;
+    font-weight:bold;
+    color:navy;
+    padding:0.25rem 1rem;
+    position:relative;
+    margin:0.5rem 0;
+    border-left:double 1rem blue;
+}
+
+pre {
+    background:black;
+    padding:0.5rem 0.25rem;
+}
+pre code {
+    font-weight:bold;
+    color:cyan;
+}
+
+img {
+    max-width:100%;
+    box-shadow:2px 2px 4px 4px gray;
+}
+table {
+    margin:1rem;
+    border:solid 0.2rem black;
+}
+td {
+    border:solid 0.1rem black;
+}
+thead tr td {
+    background:deepskyblue;
+    text-align:center;
+    font-size:1.1rem;
+    font-weight:bold;
+}
+tbody tr td:nth-child(1) {
+    background:skyblue;
+    font-weight:bold;
+    text-align:center;
+}
+td {
+    padding:0.25rem;
+}
+
+.toc_title {
+    font-size:1.25rem;
+    font-weight:bold;
+}
+
+.img_area {
+    width:100%;
+    margin:0.75rem 0;
+    text-align:center;
+}
+
+.red_text {
+    font-weight:bold;
+    color:crimson;
+}
+.green_text {
+    font-weight:bold;
+    color:forestgreen;
+}
+
+.bad {
+    background:silver;
+}
+.good {
+    background:orange;
+    font-weight:bold;
+    font-size:1.1rem;
+}
+

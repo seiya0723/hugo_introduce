@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>静的サイトジェネレーターHUGO、概要と実装について</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <header>
+    <h1>静的サイトジェネレーターHUGO、概要と実装</h1>
+    
+    </header>
+
+    <main class="container">
+
+    <nav>
+        <div class="toc_title">目次</div>
+        <ul>
+            <li><a href="#chap1">静的サイトジェネレーターとは</a></li>
+            <li><a href="#chap2">HUGOでのサイト開発の流れ</a></li>
+            <li><a href="#chap3">詳細な使い方のリンク集</a></li>
+        </ul>
+    </nav>
+
+    <h2 id="chap1">静的サイトジェネレーターとは</h2>
+
+    <h3>概要</h3>
+
+    <p>静的サイトジェネレーターとは、<span class="green_text">HTML、CSS、JS、その他メディアファイル等をひとまとめにして生成するツール</span>のこと。生成されたファイル群をサーバーにアップロードすることで簡単にデプロイできる。</p>
+
+    <p>通常、HTMLファイルを作成してひとつのサイトを作る場合、サイトの全ページでの共通部にあたるHEADタグ内の全て、ヘッダーやフッダー等を、別のページのHTMLファイルを作るたびに、コピペをしなければならない。</p>
+
+    <div class="img_area"><img src="media/normal_dev.png" alt="通常のウェブサイト開発方式"></div>
+
+    <p>一方で、静的サイトジェネレーターを使用した開発方法では、ヘッダーはヘッダー、メインはメイン等と部品化することで、複数のページにわたる手直しを避けることができる。この部品化したHTMLをひとつのウェブサイトとして構成させるため、ビルドを実行している。</p>
+
+    <div class="img_area"><img src="media/hugo_dev.png" alt="通常のウェブサイト開発方式"></div>
+
+
+    <h3>Wordpressと静的サイトジェネレーターの違い</h3>
+
+    <p>ウェブサイトを構築する際に、よく利用されるWordpress。Wordpressも静的サイトジェネレーターのように部品化されたファイルを元に、ひとつのウェブサイトを構築する事ができる。</p>
+
+    <p>ただし、Wordpressは<span class="red_text">ユーザーのリクエストが来てから、DBを参照し、動的にページを生成している</span>点で大きく異なる。</p>
+
+    <div class="img_area"><img src="media/wordpress.png" alt="Wordpressはユーザーのリクエストが来てからページを生成する"></div>
+
+    <p>そのため、Wordpressはサーバー側で動作する言語(PHP)の他に、データベースが必要になる。</p>
+
+
+    <p>一方で、HUGOの場合は、フロント言語のみで構成されているため、<span class="green_text">表示が高速かつセキュリティリスクが低いというメリット</span>がある。</p>
+
+    <p>以下、Wordpressと静的サイトジェネレーターHUGOの違いをまとめる</p>
+
+    <table>
+        <thead>
+            <tr>
+                <td>比較項目</td>
+                <td>Wordpress</td>
+                <td>HUGO</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>日本語ドキュメントの数</td>
+                <td class="good">多い</td>
+                <td class="bad">少ない</td>
+            </tr>
+            <tr>
+                <td>機能性</td>
+                <td class="good">サーバー言語が使える点で有利</td>
+                <td class="bad">フロント言語のみなので不利</td>
+            </tr>
+            <tr>
+                <td>レスポンス速度</td>
+                <td class="bad">動的にHTMLを生成するため遅い</td>
+                <td class="good">既にHTMLが生成されているので高速</td>
+            </tr>
+            <tr>
+                <td>セキュリティ</td>
+                <td class="bad">既に不正アクセスの被害が多々発生している</td>
+                <td class="good">フロント言語のみなので安全</td>
+            </tr>
+            <tr>
+                <td>コスト</td>
+                <td class="bad">サーバー代とドメイン代含めて月1000円前後</td>
+                <td class="good">githubpagesであれば無料</td>
+            </tr>
+            <tr>
+                <td>保守</td>
+                <td class="bad">DBからデータをバックアップしなければならないため複雑で手間取る</td>
+                <td class="good">サイトのディレクトリをそのままコピペするだけでバックアップとリストア完了</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <h2 id="chap2">HUGOでのサイト開発の流れ</h2>
+
+    <ol>
+        <li>HUGOのインストール</li>
+        <li>テーマの実装</li>
+        <li>テーマの改造</li>
+        <li>記事の作成</li>
+        <li>仮想サーバー立ち上げとビルド</li>
+    </ol>
+
+    <h3>HUGOのインストール</h3>
+
+
+    <p>Debian系OSの場合、下記コマンドを実行する</p>
+
+    <pre><code>sudo apt install hugo </code></pre>
+
+    <p>MacOS、もしくはHomebrewを使用する場合は下記コマンドを実行</p>
+
+    <pre><code>sudo brew install hugo </code></pre>
+
+    <p>HUGOのインストールを実行したらバージョンを確認する</p>
+
+    <pre><code>hugo version</code></pre>
+
+    <div class="img_area"><img src="media/hugo_version.png" alt="HUGOのバージョンを表示する"></div>
+
+    <p>インストールに関する詳細情報は<a href="https://gohugo.io/getting-started/installing/">公式の解説ページ</a>を参照</p>
+
+    <p>続いて、hugoコマンドを使用してサイトを作成する。下記画像の画面が表示されれば成功</p>
+
+    <pre><code>hugo new site mysite</code></pre>
+    
+    <div class="img_area"><img src="media/hugo_newsite.png" alt="HUGOの新しいサイトを作成"></div>
+
+    <p>作成されたmysiteディレクトリの中はこのようになっている。</p>
+
+    <div class="img_area"><img src="media/hugo_file.png" alt="HUGOのディレクトリ構造"></div>
+
+
+    <table>
+        <thead>
+            <tr>
+                <td>名前</td>
+                <td>役割</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>archetypes</td>
+                <td>default.mdが含まれている。hugo newコマンドで記事を作る時、作られた記事のデフォルトの中身がdefault.md</td>
+            </tr>
+            <tr>
+                <td>config.toml</td>
+                <td>サイトの設定、デプロイ先のURL、基準とする言語設定、サイトタイトル、適応するテーマの名前等、サイト設定関係の指定ができる</td>
+            </tr>
+            <tr>
+                <td>content</td>
+                <td>記事を格納する場所。ディレクトリ構造にすることも可能。</td>
+            </tr>
+            <tr>
+                <td>data</td>
+                <td>このディレクトリ内に格納されたデータファイル(jsonやCSV等)は全てのページから参照できる。(<a href="https://maku77.github.io/hugo/data/basic.html">参照</a>)</td>
+            </tr>
+            <tr>
+                <td>layouts</td>
+                <td>themesに指定したファイルを修正したい時に使う。</td>
+            </tr>
+            <tr>
+                <td>static</td>
+                <td>サイト内の静的ファイル(CSS、JS、画像、動画、音声等)を格納する場所。ここに画像を設置することで記事内でパスを指定して表示することができる</td>
+            </tr>
+            <tr>
+                <td>themes</td>
+                <td>テーマを格納する場所。HUGOの公式サイトに掲載されているgithubリンクからダウンロードしてここに配置する。</td>
+            </tr>
+            <tr>
+                <td>public</td>
+                <td>hugoコマンドを実行した時に生成される。このpublicディレクトリの中身をサーバーの共有フォルダにアップロードするだけで公開できる。</td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <p>ディレクトリが多く圧倒されるかもしれないが、<span class="green_text">重要なのはarchetypes、content、static、themes、config.tomlの5つだけ。</span></p>
+
+    <p>ディレクトリ構造に関する詳細情報は<a href="https://blog.chick-p.work/blog/2019/20191004_hugo-site-directory/">こちら</a>を参照。</p>
+
+
+    <h3>テーマの実装</h3>
+
+    <p>テーマの実装は、<a href="https://themes.gohugo.io/">HUGOの公式からテーマをダウンロード</a>してhugoのプロジェクトに配置するだけ。ただし、<span class="red_text">HUGOのバージョンが指定を上回っていないと正常に動作しないことがあるため注意</span></p>
+
+    <div class="img_area"><img src="media/hugo_themes.png" alt="テーマのバージョンによって動作しないことがあるためダウンロード時にチェックするべし"></div>
+
+    <p>前述の通り、テーマはthemesディレクトリに格納する。そして、config.tomlに下記を追記する</p>
+
+    <pre><code>theme = "/themes_name/"</code></pre>
+
+    <h3>テーマの改造</h3>
+
+    <p>テーマの改造、修正等はlayoutsディレクトリの中に格納してもいいが、大規模な改造が伴う場合は、ダウンロードしたテーマそのものに修正を加える。</p>
+
+    <p>ちなみに<a href="https://themes.gohugo.io/blank/">開発者が改造することを前提としたテーマ</a>も存在する。</p>
+    
+    <p>また、テーマには<a href="https://gohugo.io/variables/">テンプレート変数</a>、<a href="https://gohugo.io/functions/range/">ループ処理</a>、<a href="https://maku77.github.io/hugo/layout/grammer/if.html">条件分岐処理</a>等が用意されている。そのため、記事リストを表示する際等で表示する記事分だけコピペをする必要はない</p>
+
+    <h3>記事の作成</h3>
+
+    <p>記事の作成は下記hugoコマンドを実行する</p>
+
+    <pre><code>hugo new newpage.md</code></pre>
+
+    <p>上記コマンドを実行することで、archetypes/default.mdに指定された内容(記事のタイトルや時刻等のデータヘッダー)が初期値として<span class="red_text">contentディレクトリ内に作成</span>される。</p>
+
+    <div class="img_area"><img src="media/hugo_createpage.png" alt="HUGOでページを作成する"></div>
+
+    <p>ちなみに、マークダウン形式の記事を作成するのではなく、HTML形式のファイルを作りたい場合、下記コマンドを実行する。ただし予め、archetypesディレクトリ内にてdefault.htmlを用意しなければ反映されない点に注意。</p>
+
+    <pre><code>hugo new newpage.html</code></pre>
+
+    <p>また、ディレクトリ別にすることも可能。ひとつのサイト内に、作品集やブログなどを掲載したい場合には下記コマンドを実行</p>
+
+<pre><code>hugo new blog/blognewpage.md
+hugo new portfolio/portfolionewpage.md
+</code></pre>
+
+    <div class="img_area"><img src="media/hugo_createpage2.png" alt="ディレクトリ分けすることもできる"></div>
+
+    <h3>仮想サーバー立ち上げとビルド</h3>
+
+    <p>仮想サーバーを立ち上げることでプレビューができる。テーマ改造中や制作した記事の状態を確認する際に有効。ページの変更を検知して、自動的にリロードしてくれる。</p>
+
+    <pre><code>hugo server</code></pre>
+
+    <p>ポート番号を指定していない場合、デフォルトでは1313を指定することになっているが、既に使用されている場合、下記ERRORが出る。(HUGO側が未使用のポート番号をランダムで指定している)</p>
+
+    <div class="img_area"><img src="media/hugo_server_error.png" alt="hugoserver起動"></div>
+
+    <p>上記画像の場合、http://localhost:44631/にアクセスすればサイトのプレビューが見れる。ポート番号を指定したい場合は下記コマンドを実行。</p>
+
+    <pre><code>hugo server -p 12345</code></pre>
+
+    <p>任意のポート番号を指定することで、ブックマークに登録してのプレビュー確認も可能。</p>
+
+
+    <p>プレビューを確認し、完成した場合、下記コマンドを実行し、publicディレクトリにサイトデータをビルドできる。</p>
+
+    <pre><code>hugo</code></pre>
+
+    <div class="img_area"><img src="media/hugo_build.png" alt="hugoのビルド実行"></div>
+
+    <p>上記画像のように<span class="red_text">ビルドにかかる時間は非常に高速</span>。数千記事書いても数秒程度しかかからないため、サイト開発が高速化できる</p>
+
+    <p>サイトを公開する際は、publicディレクトリの中にできたファイルをサーバーにアップロードするだけ。</p>
+
+    <h3>効率よく開発をするには?</h3>
+
+    <p>テーマの開発ではHTMLファイルの編集作業が中心になるので、矩形選択や正規表現などが利用できるvim、コマンドを入力してHTMLの開始タグと終端タグを展開できるプラグインのemmet.vimを利用すると良い。</p>
+
+    <p>また、バージョンの違いによって使用することはできないテンプレート変数などがある。その場合はgrepコマンドを再帰的に使用して該当ファイルをあぶり出す。</p>
+
+    <pre><code>grep -rol "search_string" ./*</code></pre>
+
+    <div class="img_area"><img src="media/hugo_grep.png" alt="検索であぶり出し。"></div>
+
+    <h2 id="chap3">詳細な使い方のリンク集</h2>
+
+    <ul>
+        <li><a href="https://gohugo.io/documentation/">HUGO公式ドキュメント</a></li>
+        <li><a href="https://maku77.github.io/hugo/">まくまくHugo/Goノート</a></li>
+        <li><a href="https://blog.chick-p.work/tags/hugo/">HUGO|ひよこまめ</a></li>
+        <li><a href="http://staff.feedtailor.jp/2016/04/27/hugo_04/">静的サイトジェネレータHugoを使ったサイト構築（レイアウト編２） · feedtailor Inc. スタッフブログ</a></li>
+    </ul>
+
+
+    </main>
+
+
+
+
+
+
+</body>
+</html>
+
